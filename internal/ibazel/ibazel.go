@@ -70,6 +70,7 @@ type IBazel struct {
 	args        []string
 	bazelArgs   []string
 	startupArgs []string
+	setPGID     bool
 
 	sigs           chan os.Signal // Signals channel for the current process
 	interruptCount int
@@ -183,6 +184,10 @@ func (i *IBazel) SetStartupArgs(args []string) {
 
 func (i *IBazel) SetDebounceDuration(debounceDuration time.Duration) {
 	i.debounceDuration = debounceDuration
+}
+
+func (i *IBazel) SetSetPGID(setPGID bool) {
+	i.setPGID = setPGID
 }
 
 func (i *IBazel) Cleanup() {
@@ -423,9 +428,9 @@ func (i *IBazel) setupRun(target string) command.Command {
 
 	if commandNotify {
 		log.Logf("Launching with notifications")
-		return commandNotifyCommand(i.startupArgs, i.bazelArgs, target, i.args)
+		return commandNotifyCommand(i.startupArgs, i.bazelArgs, target, i.setPGID, i.args)
 	} else {
-		return commandDefaultCommand(i.startupArgs, i.bazelArgs, target, i.args)
+		return commandDefaultCommand(i.startupArgs, i.bazelArgs, target, i.setPGID, i.args)
 	}
 }
 

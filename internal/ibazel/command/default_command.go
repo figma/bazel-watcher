@@ -30,17 +30,19 @@ type defaultCommand struct {
 	args        []string
 	pg          process_group.ProcessGroup
 	termSync    sync.Once
+	setPGID     bool
 }
 
 // DefaultCommand is the normal mode of interacting with iBazel. If you start a
 // server in this mode and notify of changes the server will be killed and
 // restarted.
-func DefaultCommand(startupArgs []string, bazelArgs []string, target string, args []string) Command {
+func DefaultCommand(startupArgs []string, bazelArgs []string, target string, setPGID bool, args []string) Command {
 	return &defaultCommand{
 		target:      target,
 		startupArgs: startupArgs,
 		bazelArgs:   bazelArgs,
 		args:        args,
+		setPGID:     setPGID,
 	}
 }
 
@@ -70,7 +72,7 @@ func (c *defaultCommand) Start() (*bytes.Buffer, error) {
 	b.WriteToStdout(true)
 
 	var outputBuffer *bytes.Buffer
-	outputBuffer, c.pg = start(b, c.target, c.args)
+	outputBuffer, c.pg = start(b, c.target, c.setPGID, c.args)
 
 	c.pg.RootProcess().Env = os.Environ()
 

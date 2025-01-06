@@ -32,16 +32,18 @@ type notifyCommand struct {
 	pg          process_group.ProcessGroup
 	stdin       io.WriteCloser
 	termSync    sync.Once
+	setPGID     bool
 }
 
 // NotifyCommand is an alternate mode for starting a command. In this mode the
 // command will be notified on stdin that the source files have changed.
-func NotifyCommand(startupArgs []string, bazelArgs []string, target string, args []string) Command {
+func NotifyCommand(startupArgs []string, bazelArgs []string, target string, setPGID bool, args []string) Command {
 	return &notifyCommand{
 		startupArgs: startupArgs,
 		target:      target,
 		bazelArgs:   bazelArgs,
 		args:        args,
+		setPGID:     setPGID,
 	}
 }
 
@@ -71,7 +73,7 @@ func (c *notifyCommand) Start() (*bytes.Buffer, error) {
 	b.WriteToStdout(true)
 
 	var outputBuffer *bytes.Buffer
-	outputBuffer, c.pg = start(b, c.target, c.args)
+	outputBuffer, c.pg = start(b, c.target, c.setPGID, c.args)
 	// Keep the writer around.
 	var err error
 	c.stdin, err = c.pg.RootProcess().StdinPipe()
@@ -126,6 +128,7 @@ func (c *notifyCommand) NotifyOfChanges() *bytes.Buffer {
 		if !c.IsSubprocessRunning() {
 			log.Log("Restarting process...")
 			c.Terminate()
+			// TODO(dmiller): Report the error to the user.
 			c.Start()
 		}
 	}

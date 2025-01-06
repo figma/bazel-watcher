@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build !windows
 // +build !windows
 
 package process_group
@@ -27,9 +28,9 @@ type unixProcessGroup struct {
 
 // Command creates a new ProcessGroup with a root command specified by the
 // arguments.
-func Command(name string, arg ...string) ProcessGroup {
+func Command(name string, setPGID bool, arg ...string) ProcessGroup {
 	root := exec.Command(name, arg...)
-	root.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	root.SysProcAttr = &syscall.SysProcAttr{Setpgid: setPGID}
 	return &unixProcessGroup{root}
 }
 

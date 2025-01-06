@@ -41,8 +41,8 @@ func assertKilled(t *testing.T, cmd *exec.Cmd) {
 func TestSubprocessRunning(t *testing.T) {
 	log.SetLogger(t)
 
-	execCommand = func(name string, args ...string) process_group.ProcessGroup {
-		return oldExecCommand("ls") // Every system has ls.
+	execCommand = func(name string, setPGID bool, args ...string) process_group.ProcessGroup {
+		return oldExecCommand("ls", setPGID) // Every system has ls.
 	}
 	defer func() { execCommand = oldExecCommand }()
 

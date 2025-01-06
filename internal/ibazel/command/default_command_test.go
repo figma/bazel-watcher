@@ -31,17 +31,17 @@ func TestDefaultCommand(t *testing.T) {
 
 	if runtime.GOOS == "windows" {
 		// TODO(jchw): Remove hardcoded path.
-		toKill = process_group.Command("C:\\windows\\system32\\notepad")
+		toKill = process_group.Command("C:\\windows\\system32\\notepad", true)
 	} else {
-		toKill = process_group.Command("sleep", "10s")
+		toKill = process_group.Command("sleep", true, "10s")
 	}
 
-	execCommand = func(name string, args ...string) process_group.ProcessGroup {
+	execCommand = func(name string, setPGID bool, args ...string) process_group.ProcessGroup {
 		if runtime.GOOS == "windows" {
 			// TODO(jchw): Remove hardcoded path.
-			return oldExecCommand("C:\\windows\\system32\\where")
+			return oldExecCommand("C:\\windows\\system32\\where", setPGID, args...)
 		}
-		return oldExecCommand("ls") // Every system has ls.
+		return oldExecCommand("ls", setPGID) // Every system has ls.
 	}
 	defer func() { execCommand = oldExecCommand }()
 
@@ -71,18 +71,18 @@ func TestDefaultCommand_Start(t *testing.T) {
 	log.SetLogger(t)
 
 	// Set up mock execCommand and prep it to be returned
-	execCommand = func(name string, args ...string) process_group.ProcessGroup {
+	execCommand = func(name string, setPGID bool, args ...string) process_group.ProcessGroup {
 		if runtime.GOOS == "windows" {
 			// TODO(jchw): Remove hardcoded path.
-			return oldExecCommand("C:\\windows\\system32\\where")
+			return oldExecCommand("C:\\windows\\system32\\where", setPGID, args...)
 		}
-		return oldExecCommand("ls") // Every system has ls.
+		return oldExecCommand("ls", setPGID, args...) // Every system has ls.
 	}
 	defer func() { execCommand = oldExecCommand }()
 
 	b := &mock_bazel.MockBazel{}
 
-	_, pg := start(b, "//path/to:target", []string{"moo"})
+	_, pg := start(b, "//path/to:target", true, []string{"moo"})
 	pg.Start()
 
 	if pg.RootProcess().Stdout != os.Stdout {

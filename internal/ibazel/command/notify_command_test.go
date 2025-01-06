@@ -27,7 +27,7 @@ import (
 func TestNotifyCommand(t *testing.T) {
 	log.SetLogger(t)
 
-	pg := process_group.Command("cat")
+	pg := process_group.Command("cat", true)
 
 	c := &notifyCommand{
 		args:      []string{"moo"},
@@ -92,9 +92,9 @@ func TestNotifyCommand_Restart(t *testing.T) {
 
 	var pg process_group.ProcessGroup
 
-	pg = process_group.Command("ls")
-	execCommand = func(name string, args ...string) process_group.ProcessGroup {
-		return oldExecCommand("ls")
+	pg = process_group.Command("ls", true)
+	execCommand = func(name string, setPGID bool, args ...string) process_group.ProcessGroup {
+		return oldExecCommand("ls", setPGID, args...)
 	}
 	defer func() { execCommand = oldExecCommand }()
 

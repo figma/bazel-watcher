@@ -145,7 +145,7 @@ func getMockCommand(i *IBazel) *mockCommand {
 }
 
 func init() {
-	commandDefaultCommand = func(startupArgs []string, bazelArgs []string, target string, args []string) command.Command {
+	commandDefaultCommand = func(startupArgs []string, bazelArgs []string, target string, setPGID bool, args []string) command.Command {
 		// Don't do anything
 		return &mockCommand{
 			startupArgs: startupArgs,
@@ -347,7 +347,7 @@ func TestIBazelTest(t *testing.T) {
 func TestIBazelRun_notifyPreexistiingJobWhenStarting(t *testing.T) {
 	log.SetTesting(t)
 
-	commandDefaultCommand = func(startupArgs []string, bazelArgs []string, target string, args []string) command.Command {
+	commandDefaultCommand = func(startupArgs []string, bazelArgs []string, target string, setPGID bool, args []string) command.Command {
 		assertEqual(t, startupArgs, []string{}, "Startup args")
 		assertEqual(t, bazelArgs, []string{}, "Bazel args")
 		assertEqual(t, target, "", "Target")

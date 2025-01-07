@@ -46,10 +46,6 @@ func NotifyCommand(startupArgs []string, bazelArgs []string, target string, args
 }
 
 func (c *notifyCommand) Terminate() {
-	if !c.IsSubprocessRunning() {
-		c.pg = nil
-		return
-	}
 	c.termSync.Do(func() {
 		terminate(c.pg)
 	})

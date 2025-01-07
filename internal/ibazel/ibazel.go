@@ -132,7 +132,7 @@ func (i *IBazel) handleSignals() {
 	// Got an OS signal (SIGINT, SIGTERM, SIGHUP).
 	sig := <-i.sigs
 
-	if i.cmd == nil || !i.cmd.IsSubprocessRunning() {
+	if i.cmd == nil {
 		osExit(3)
 		return
 	}

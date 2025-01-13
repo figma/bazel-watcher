@@ -45,10 +45,6 @@ func DefaultCommand(startupArgs []string, bazelArgs []string, target string, arg
 }
 
 func (c *defaultCommand) Terminate() {
-	if !c.IsSubprocessRunning() {
-		c.pg = nil
-		return
-	}
 	c.termSync.Do(func() {
 		terminate(c.pg)
 	})

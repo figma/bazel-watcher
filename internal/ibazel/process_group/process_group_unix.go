@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build !windows
 // +build !windows
 
 package process_group
 
 import (
+	"fmt"
 	"os/exec"
 	"syscall"
 )
@@ -45,7 +47,10 @@ func (pg *unixProcessGroup) Signal(signum syscall.Signal) error {
 	// Send the signal to the process PID which should propagate down to any
 	// subprocesses in the PGID (Process Group ID). To send to the PGID, send the
 	// signal to the negative of the process PID.
-	return syscall.Kill(-pg.root.Process.Pid, signum)
+	if pg.root.Process != nil {
+		return syscall.Kill(-pg.root.Process.Pid, signum)
+	}
+	return fmt.Errorf("root process not started")
 }
 
 func (pg *unixProcessGroup) Wait() error {

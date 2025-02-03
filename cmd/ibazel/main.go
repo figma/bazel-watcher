@@ -80,6 +80,7 @@ var overrideableBazelFlags []string = []string{
 	"--test_tag_filters=",
 	"--test_timeout=",
 	"--test_summary=",
+	"--noremote_accept_cached",
 	// Custom Starlark build settings
 	// https://docs.bazel.build/versions/master/skylark/config.html#using-build-settings-on-the-command-line
 	"--//",
@@ -210,7 +211,7 @@ func applyDefaultBazelArgs(bazelArgs []string) []string {
 			return bazelArgs
 		}
 	}
-	if (isTerminal()) {
+	if isTerminal() {
 		return append(bazelArgs, "--isatty=1")
 	} else {
 		return append(bazelArgs, "--isatty=0")
